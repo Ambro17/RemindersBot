@@ -6,7 +6,7 @@ def time_options_keyboard():
     HOUR = 60 * MINUTE
     buttons = [
         [
-            Button('5 Mins', callback_data=1 * MINUTE),
+            Button('5 Mins', callback_data=5 * MINUTE),
             Button('10 Mins', callback_data=10 * MINUTE),
             Button('20 Mins', callback_data=20 * MINUTE),
             Button('30 Mins', callback_data=30 * MINUTE),
