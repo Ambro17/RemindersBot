@@ -5,7 +5,7 @@ import logging
 
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, Filters
 
-from bot.constants import READ_REMINDER
+from bot.constants import READ_DELETE
 from bot.persistence.db_ops import remove_reminder
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ def rm_reminder(bot, update, args):
     if not args:
         update.effective_message.reply_text("🗑 Qué reminder queres borrar?", quote=False)
         logger.info("Waiting user input on what reminder to remove..")
-        return READ_REMINDER
+        return READ_DELETE
 
     reminder_key = ' '.join(args)
     return _delete_reminder(bot, update, reminder_key)
@@ -44,7 +44,7 @@ remove_reminders = ConversationHandler(
         CommandHandler('borrar', rm_reminder, pass_args=True),
     ],
     states={
-        READ_REMINDER: [MessageHandler(Filters.text, rm_reminder_from_text)]
+        READ_DELETE: [MessageHandler(Filters.text, rm_reminder_from_text)]
     },
     fallbacks=[]
 )

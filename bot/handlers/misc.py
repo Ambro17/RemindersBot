@@ -17,8 +17,8 @@ def start(bot, update):
         f'Podés elegir dentro de cuanto querés ser '
         f'notificado desde las opciones o escribir '
         f'la fecha vos mismo.\n'
-        f'También hay atajos /r = /recordar = /reminder.\n'
-        f'/borrar = /delete'
+        f'También hay atajos /r = /recordar = /remind\n'
+        f'/borrar = /delete\n'
         f'Proximamente habrá eventos recurrentes con '
         f'/event'
     )
