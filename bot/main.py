@@ -6,9 +6,6 @@ import sys
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from bot.handlers.set_check_timezone import change_timezone, check_timezone
-from bot.persistence.psqlpersistence import PSQLPersistence
-
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s [%(funcName)s] %(message)s',
     level=logging.INFO
@@ -22,8 +19,10 @@ from bot.handlers.misc import start, default, ups_handler
 from bot.handlers.remove_reminder import remove_reminders
 from bot.handlers.repeat_reminder import repeat_reminder
 from bot.handlers.reminders_set import reminders_set
+from bot.handlers.set_check_timezone import change_timezone, check_timezone
 from bot.handlers.show_reminders import see_user_reminders
 from bot.jobs.job_loader import load_reminders
+from bot.persistence.psqlpersistence import PSQLPersistence
 from bot.utils import msg_admin
 
 
