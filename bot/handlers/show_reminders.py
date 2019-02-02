@@ -6,7 +6,7 @@ import logging
 
 from telegram.ext import CommandHandler
 
-from bot.persistence.db_ops import get_reminders
+from bot.jobs.db_ops import get_reminders
 from bot.utils import isoformat_to_datetime
 
 logger = logging.getLogger(__name__)

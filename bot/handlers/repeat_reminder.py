@@ -8,14 +8,14 @@ from telegram.ext import ConversationHandler, CallbackQueryHandler, MessageHandl
 
 from bot.constants import READ_TIME_SELECTION, READ_CUSTOM_TIME
 from bot.keyboard import DONE, REMIND_AGAIN
-from bot.persistence.db_ops import remove_reminder, get_reminders
+from bot.jobs.db_ops import remove_reminder, get_reminders
 from bot.handlers.reminders_set import parse_time_from_text, read_time_selection_from_button
 from bot.utils import msg_admin, init_reminder_context, _show_time_options
 
 logger = logging.getLogger(__name__)
 
 
-def handle_repeat_decision(bot, update, chat_data):
+def handle_repeat_decision(bot, update, chat_data, user_data):
     # Get reminder key (user_id, text, date)
     logger.info("STARTED new repeat decision conversation")
     cbackquery = update.callback_query
@@ -28,7 +28,7 @@ def handle_repeat_decision(bot, update, chat_data):
     if answer == DONE:
         CONGRATZ_ICON = random.choice('🥇🏆🏅🎖')
         update.callback_query.message.edit_text(
-            f'Bien ahí! {CONGRATZ_ICON}',
+            f'Well done! {CONGRATZ_ICON}',
             reply_markup=None
         )
         try:
@@ -63,7 +63,9 @@ def handle_repeat_decision(bot, update, chat_data):
         logger.info(f"Reminder to repeat {reminder}")
         context = init_reminder_context(reminder.text,
                                         cbackquery.from_user,
-                                        cbackquery.from_user.id)
+                                        cbackquery.from_user.id,
+                                        user_data.get('offset', 0)
+                                        )
         chat_data.update(context)
 
         logger.info("Showing time options..")
@@ -83,7 +85,7 @@ def handle_repeat_decision(bot, update, chat_data):
 repeat_reminder = ConversationHandler(
     entry_points=[
         # Capture if the user is Done with the reminder, or wants to repeat it
-        CallbackQueryHandler(handle_repeat_decision, pass_chat_data=True)],
+        CallbackQueryHandler(handle_repeat_decision, pass_chat_data=True, pass_user_data=True)],
     states={
         READ_TIME_SELECTION: [
             # Wait for user input on when s/he wants to be reminded
@@ -101,5 +103,7 @@ repeat_reminder = ConversationHandler(
                            pass_job_queue=True)
         ],
     },
-    fallbacks=[]
+    fallbacks=[],
+    name='Repeat reminder',
+    persistent=True
 )

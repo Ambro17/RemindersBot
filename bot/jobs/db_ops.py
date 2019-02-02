@@ -1,6 +1,6 @@
 import logging
 
-from bot.persistence.models import Session, Reminder
+from bot.jobs.models import Session, Reminder
 
 logger = logging.getLogger(__name__)
 

@@ -39,16 +39,11 @@ class Reminder(Base):
     user_tag = Column(String)
     remind_time = Column(String)
     chat_id = Column(String)
+    offset = Column(Integer)
     expired = Column(Boolean, default=False)
     job_context = Column(JSONEncodedValue)
 
     def __repr__(self):
-        return "Reminder(text='%s', user_id='%s', user_tag='%s', remind_time=%s, chat_id=%s, key=%s, expired=%s)" % (
-            self.text,
-            self.user_id,
-            self.user_tag,
-            self.remind_time,
-            self.chat_id,
-            self.key,
-            self.expired
-        )
+        return (f"Reminder(text={self.text}, user_id={self.user_id}, user_tag={self.user_tag},"
+                f" remind_time={self.remind_time}, offset= {self.offset}, chat_id={self.chat_id},"
+                f" key={self.key}, expired={self.expired})")

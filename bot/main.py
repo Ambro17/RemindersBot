@@ -6,6 +6,8 @@ import sys
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+from bot.handlers.set_check_timezone import change_timezone, check_timezone
+from bot.persistence.psqlpersistence import PSQLPersistence
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s [%(funcName)s] %(message)s',
@@ -21,12 +23,13 @@ from bot.handlers.remove_reminder import remove_reminders
 from bot.handlers.repeat_reminder import repeat_reminder
 from bot.handlers.reminders_set import reminders_set
 from bot.handlers.show_reminders import see_user_reminders
-from bot.persistence.job_loader import load_reminders
+from bot.jobs.job_loader import load_reminders
 from bot.utils import msg_admin
 
 
 def main():
-    updater = Updater(os.environ['BOT_KEY'])
+    bot_persistence = PSQLPersistence(os.environ['DATABASE_URL'])
+    updater = Updater(os.environ['BOT_KEY'], persistence=bot_persistence)
     dp = updater.dispatcher
 
     start_handler = CommandHandler('start', start)
@@ -42,6 +45,8 @@ def main():
     dp.add_handler(repeat_reminder)
     dp.add_handler(remove_reminders)
     dp.add_handler(see_user_reminders)
+    dp.add_handler(change_timezone)
+    dp.add_handler(check_timezone)
     dp.add_handler(events_set)
 
     # Add special handlers. Error handler and fallback handler.
@@ -61,5 +66,4 @@ if __name__ == '__main__':
         sys.exit(main())
     except Exception as e:
         logger.error("An update broke the bot.", exc_info=True)
-        msg_admin(f'Check the logs, something bad happened {e!r}')
         sys.exit(ERROR_EXIT)

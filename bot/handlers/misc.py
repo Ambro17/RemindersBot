@@ -9,19 +9,25 @@ logger = logging.getLogger(__name__)
 
 
 def start(bot, update):
-    update.message.reply_text(
-        f'Hola! Soy @RRemindersBot y estoy para recordarte\n\n'
-        f'/remind para setear un nuevo reminder\n'
-        f'/reminders para ver los reminders guardados\n'
-        f'/delete para borrar un reminder\n\n'
-        f'Podés elegir dentro de cuanto querés ser '
-        f'notificado desde las opciones o escribir '
-        f'la fecha vos mismo.\n'
-        f'También hay atajos /r = /recordar = /remind\n'
-        f'/borrar = /delete\n'
-        f'Proximamente habrá eventos recurrentes con '
-        f'/event'
-    )
+    update.message.reply_text("""
+Hello! I'm @RRemindersBot and i'm here to remind you
+
+My skills include:
+
+/remind to set new reminders
+/reminders to show current reminders
+/delete to delete a reminder
+
+Before setting a new reminder it is recommended that 
+you set your timezone with 
+/setmytime
+so reminders work as expected. You can check with 
+/mytime if it shows your current time
+
+There are also some command alias to ease interaction.
+/r = /recordar = /remind
+/borrar = /delete
+""")
 
 
 def ups_handler(bot, update, error):
@@ -41,5 +47,5 @@ def default(bot, update):
     if random.choice((0, 1)):
         bot.send_message(
             chat_id=update.effective_message.chat_id,
-            text='🧐 No te entiendo.. escribí /start para ver instrucciones de uso'
+            text="I don't get you 🧐.. write /start to see what are my skills"
         )

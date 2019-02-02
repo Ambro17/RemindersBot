@@ -1,6 +1,6 @@
 import logging
 
-from bot.persistence.db_ops import get_reminders
+from bot.jobs.db_ops import get_reminders
 from bot.utils import send_notification, isoformat_to_datetime
 
 logger = logging.getLogger(__name__)

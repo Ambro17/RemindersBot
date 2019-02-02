@@ -1,14 +1,14 @@
+import copy
 import logging
 import os
 import random
 from datetime import datetime, timedelta
 
 import dateparser
-import pytz
 
 from bot.keyboard import done_or_repeat_reminder, time_options_keyboard
-from bot.persistence.db_ops import add_reminder, expire_reminder
-from bot.persistence.models import Reminder
+from bot.jobs.db_ops import add_reminder, expire_reminder
+from bot.jobs.models import Reminder
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +20,14 @@ def _tag_user(user):
         return f"[{user.first_name}](tg://user?id={user.id})"
 
 
-def init_reminder_context(to_remind, user, chat_id):
+def init_reminder_context(to_remind, user, chat_id, offset):
     logger.info(f"Building reminder context for {user.name}")
     return {
         'thing_to_remind': to_remind,
         'user_id': user.id,
         'user_tag': _tag_user(user),
         'chat_id': chat_id,
+        'offset': offset,
     }
 
 
@@ -36,7 +37,7 @@ def msg_admin(bot, message, **kwargs):
 
 def datetime_from_answer(time_delay):
     """Returns a datetime object and its isoformat from time_delay in seconds"""
-    when = datetime.now() + timedelta(seconds=time_delay)
+    when = datetime.utcnow() + timedelta(seconds=time_delay)
     return when
 
 
@@ -62,6 +63,7 @@ def add_job_to_db(job_context: dict) -> bool:
             user_tag=job_context['user_tag'],
             remind_time=job_context['remind_date_iso'],
             chat_id=job_context['chat_id'],
+            offset=job_context['offset'],
             job_context=job_context,
             key=reminder_key(job_context)
         )
@@ -99,7 +101,7 @@ def send_notification(bot, job):
 def _show_time_options(update, from_remind_again=False):
     """Show user time options for when to be reminded."""
     message = {
-        'text': 'Perfecto👌 Ahora elegí cuando querés recordarlo. 🕙',
+        'text': 'Perfect👌 Now choose when to be reminded. 🕙',
         'reply_markup': time_options_keyboard(),
         'parse_mode': 'markdown'
     }
@@ -114,9 +116,12 @@ def _show_time_options(update, from_remind_again=False):
 
 def reply_reminder_details(update, job_context, from_callback=False):
     utc_date = dateparser.parse(job_context['remind_date_iso'])
-    bs_as_date = pytz.timezone('America/Argentina/Buenos_Aires').localize(utc_date)
-    text = (f"✅ Listo, te voy a recordar `{job_context['thing_to_remind']}`"
-            f" el {bs_as_date.strftime('%d/%m')} a las {bs_as_date.strftime('%H:%M')} 🔔")
+    user_date = utc_date + timedelta(seconds=job_context['offset'])
+    logger.info(f"Transformed UTC {utc_date} into {user_date}")
+
+    text = (f"✅ Done. I will remind you of `{job_context['thing_to_remind']}`"
+            f" on {user_date.strftime('%d/%m')} at {user_date.strftime('%H:%M')} 🔔")
+
     if from_callback:
         update.callback_query.message.edit_text(
             text=text,
@@ -129,3 +134,25 @@ def reply_reminder_details(update, job_context, from_callback=False):
 
 def isoformat_to_datetime(date_string):
     return dateparser.parse(date_string)
+
+
+def _setup_reminder(bot, update, chat_data, job_queue, when, from_callback=False):
+    """Setup a new reminder in the job_queue.
+
+    Notify the user in chat_data the thing s/he wants to remind when *when* datetime
+    occurs, by setting up a new run_once job on the job_queue
+    """
+    chat_data.update({'remind_date_iso': when.isoformat()})
+    job_context = copy.deepcopy(chat_data)
+
+    logger.info(f'Adding job to db an job queue with context: {job_context}')
+    success = add_reminder_job(bot, update, job_queue, job_context, when)
+    if success:
+        logger.info('SUCCESS')
+        reply_reminder_details(update, job_context, from_callback=from_callback)
+    else:
+        logger.error("ERROR. Could not save reminder.")
+        update.callback_query.message.edit_text(
+            text=f"🚫 Error saving reminder. Please try again later..",
+            reply_markup=None
+        )
