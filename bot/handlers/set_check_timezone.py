@@ -25,6 +25,11 @@ def _seconds_to_hour_n_minutes(seconds):
     m, rest = divmod(rest, MINUTE)
     return int(h), int(m)
 
+def _offset_seconds_to_utc_shift(seconds):
+    h, m = _seconds_to_hour_n_minutes(seconds)
+    padded_mins = str(m).zfill(2)
+    return f"{h}:{padded_mins}"
+
 def read_timezone(bot, update, user_data):
     try:
         user_time = datetime.strptime(update.message.text, '%d/%m %H:%M')
@@ -68,7 +73,7 @@ def check_time(bot, update, user_data):
     else:
         utc_now = datetime.utcnow()
         user_now = utc_now + timedelta(seconds=offset)
-        text = user_now.strftime('Your time is: `%H:%M`')
+        text = user_now.strftime(f'Your time is: `%H:%M`\n\n» UTC offset `{_offset_seconds_to_utc_shift(offset)}`')
 
     update.message.reply_markdown(text)
 

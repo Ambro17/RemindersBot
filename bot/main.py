@@ -18,7 +18,7 @@ from bot.handlers.event_set import events_set
 from bot.handlers.misc import start, default, ups_handler
 from bot.handlers.remove_reminder import remove_reminders
 from bot.handlers.repeat_reminder import repeat_reminder
-from bot.handlers.reminders_set import reminders_set
+from bot.handlers.remind import reminders_set
 from bot.handlers.set_check_timezone import change_timezone, check_timezone
 from bot.handlers.show_reminders import see_user_reminders
 from bot.jobs.job_loader import load_reminders

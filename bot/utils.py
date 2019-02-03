@@ -117,7 +117,7 @@ def _show_time_options(update, from_remind_again=False):
 def reply_reminder_details(update, job_context, from_callback=False):
     utc_date = dateparser.parse(job_context['remind_date_iso'])
     user_date = utc_date + timedelta(seconds=job_context['offset'])
-    logger.info(f"Transformed UTC {utc_date} into {user_date}")
+    logger.info(f"Transformed UTC {utc_date} into {user_date} to inform user in his/her local time")
 
     text = (f"✅ Done. I will remind you of `{job_context['thing_to_remind']}`"
             f" on {user_date.strftime('%d/%m')} at {user_date.strftime('%H:%M')} 🔔")
@@ -156,3 +156,19 @@ def _setup_reminder(bot, update, chat_data, job_queue, when, from_callback=False
             text=f"🚫 Error saving reminder. Please try again later..",
             reply_markup=None
         )
+
+
+def utc_time_from_user_date(user_date, offset):
+    """Get utc time equivalent given a user date and an offset for that date.
+
+    i.e:
+       User input:
+            15:00
+       User offset:
+            -10800 (UTC -3:00)
+       UTC output:
+            12:00
+    """
+    # Get utc from raw_date. If original date is 15:00 and offset is -3:00 -> 12:00 (UTC)
+    utc_date = user_date - timedelta(seconds=offset)
+    return utc_date

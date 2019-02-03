@@ -6,13 +6,13 @@ import logging
 import dateparser
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, CallbackQueryHandler, Filters
 
-from bot.constants import READ_REMINDER, READ_TIME_SELECTION, READ_CUSTOM_TIME, CUSTOM
+from bot.constants import READ_REMINDER, READ_TIME_SELECTION, READ_CUSTOM_DATE, CUSTOM
 from bot.utils import (
     init_reminder_context,
     datetime_from_answer,
     _show_time_options,
     _setup_reminder,
-)
+    utc_time_from_user_date)
 
 logger = logging.getLogger(__name__)
 
@@ -73,18 +73,20 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
 
     if requested_delay == CUSTOM:
         logger.info("User selected custom date. Replying with available formats..")
-        text = (f"Enter when i should remind you.\n"
+        text = (f"When should i remind you?\n"
                 f"I understand dates like:\n"
-                f"👉 d/m hh:mm\n"
+                f"👉 today at 17:00\n"
                 f"👉 tomorrow at 13:00\n"
-                f"👉 friday at 21:00")
+                f"👉 friday at 21:00\n"
+                f"👉 d/m hh:mm\n"
+                )
         update.callback_query.message.edit_text(
             text=text,
             reply_markup=None,
             parse_mode='markdown'
         )
         logger.info("Waiting for user input on remind date")
-        return READ_CUSTOM_TIME
+        return READ_CUSTOM_DATE
 
     # Get datetime from requested_delay seconds
     when = datetime_from_answer(requested_delay)
@@ -95,22 +97,22 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
     return ConversationHandler.END
 
 
-def parse_time_from_text(bot, update, chat_data, job_queue):
-    # Update show_time_options keyboard
+def read_custom_date(bot, update, chat_data, job_queue, user_data):
+    """Parse offseted date from user and save a job in utc time. Show reminder details localized"""
     user_date = update.message.text
     logger.info(f'User input date: {user_date}. Attempting parsing..')
 
     date = dateparser.parse(update.message.text, settings={'PREFER_DATES_FROM': 'future'})
     if date is None:
         logger.error('Error parsing date. Waiting for user retry.')
-        update.message.reply_text('No pude interpretar la fecha.'
-                                  ' Intenta de nuevo con un formato más estándar (`d/m hh:mm`)',
+        update.message.reply_text('What date is that? 🤨'
+                                  ' Try again with a more standard format (`d/m hh:mm`)',
                                   parse_mode='markdown')
         return
-    logger.info(f'Parsed user date: {date}')
 
-    # Get datetime from input text
-    when, when_iso = date, date.isoformat()
+    utc_date = utc_time_from_user_date(date, user_data.get('offset', 0))
+    logger.info(f"Parsed local {date} into  UTC {utc_date}")
+    when, when_iso = utc_date, utc_date.isoformat()
     logger.info("Setting up new reminder from custom date")
     _setup_reminder(bot, update, chat_data, job_queue, when)
 
@@ -137,11 +139,12 @@ reminders_set = ConversationHandler(
                 pass_job_queue=True,
             )
         ],
-        READ_CUSTOM_TIME: [
+        READ_CUSTOM_DATE: [
             # If user selected Custom option, wait until it writes a date as remind time
-            MessageHandler(Filters.text, parse_time_from_text,
+            MessageHandler(Filters.text, read_custom_date,
                            pass_chat_data=True,
                            pass_job_queue=True,
+                           pass_user_data=True,
                            )
         ]
     },

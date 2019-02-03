@@ -6,10 +6,10 @@ import random
 
 from telegram.ext import ConversationHandler, CallbackQueryHandler, MessageHandler, Filters
 
-from bot.constants import READ_TIME_SELECTION, READ_CUSTOM_TIME
+from bot.constants import READ_TIME_SELECTION, READ_CUSTOM_DATE
 from bot.keyboard import DONE, REMIND_AGAIN
 from bot.jobs.db_ops import remove_reminder, get_reminders
-from bot.handlers.reminders_set import parse_time_from_text, read_time_selection_from_button
+from bot.handlers.remind import read_custom_date, read_time_selection_from_button
 from bot.utils import msg_admin, init_reminder_context, _show_time_options
 
 logger = logging.getLogger(__name__)
@@ -95,10 +95,10 @@ repeat_reminder = ConversationHandler(
                 pass_job_queue=True
             )
         ],
-        READ_CUSTOM_TIME: [
+        READ_CUSTOM_DATE: [
             # If user selected Custom option, wait until it writes a date as remind time
             MessageHandler(Filters.text,
-                           parse_time_from_text,
+                           read_custom_date,
                            pass_chat_data=True,
                            pass_job_queue=True)
         ],
