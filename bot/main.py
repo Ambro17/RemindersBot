@@ -14,13 +14,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 from bot.constants import NORMAL_EXIT, ERROR_EXIT
-from bot.handlers.event_set import events_set
+from bot.handlers.event import events_set
 from bot.handlers.feedback import add_feedback
 from bot.handlers.misc import start, default, ups_handler
-from bot.handlers.remove_reminder import remove_reminders
-from bot.handlers.repeat_reminder import repeat_reminder
+from bot.handlers.delete import remove_reminders
+from bot.handlers.repeat import repeat_reminder
 from bot.handlers.remind import reminders_set
-from bot.handlers.set_check_timezone import change_timezone, check_timezone
+from bot.handlers.mytimezone import change_timezone, check_timezone
 from bot.handlers.show_reminders import see_user_reminders
 from bot.jobs.job_loader import load_reminders
 from bot.persistence.psqlpersistence import PSQLPersistence

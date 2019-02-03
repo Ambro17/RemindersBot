@@ -172,3 +172,7 @@ def utc_time_from_user_date(user_date, offset):
     # Get utc from raw_date. If original date is 15:00 and offset is -3:00 -> 12:00 (UTC)
     utc_date = user_date - timedelta(seconds=offset)
     return utc_date
+
+def user_current_time(user_offset):
+    """Return user datetime.now()"""
+    return datetime.utcnow() + timedelta(seconds=user_offset)

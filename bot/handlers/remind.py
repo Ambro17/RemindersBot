@@ -12,7 +12,9 @@ from bot.utils import (
     datetime_from_answer,
     _show_time_options,
     _setup_reminder,
-    utc_time_from_user_date)
+    utc_time_from_user_date,
+    user_current_time,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -80,9 +82,10 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
         logger.info("User selected custom date. Replying with available formats..")
         text = (f"» *When should i remind you?*\n"
                 f"I understand dates like:\n"
+                f"👉 in 45 minutes\n"
                 f"👉 today at 17:00\n"
                 f"👉 tomorrow at 13:00\n"
-                f"👉 friday at 21:00\n"
+                f"👉 on friday at 21:00\n"
                 f"👉 d/m hh:mm\n"
                 )
         update.callback_query.message.edit_text(
@@ -105,9 +108,14 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
 def read_custom_date(bot, update, chat_data, job_queue, user_data):
     """Parse offseted date from user and save a job in utc time. Show reminder details localized"""
     user_date = update.message.text
-    logger.info(f'User input date: {user_date}. Attempting parsing..')
+    user_offset = user_data.get('offset', 0)
+    logger.info(f'User input date: {user_date}. Attempting parsing with offset: {user_offset}')
 
-    date = dateparser.parse(update.message.text, settings={'PREFER_DATES_FROM': 'future'})
+    date = dateparser.parse(
+        update.message.text,
+        settings={'PREFER_DATES_FROM': 'future',
+                  'RELATIVE_BASE': user_current_time(user_offset)}
+    )
     if date is None:
         logger.error('Error parsing date. Waiting for user retry.')
         update.message.reply_text('What date is that? 🤨\n'
@@ -115,7 +123,7 @@ def read_custom_date(bot, update, chat_data, job_queue, user_data):
                                   parse_mode='markdown')
         return
 
-    utc_date = utc_time_from_user_date(date, user_data.get('offset', 0))
+    utc_date = utc_time_from_user_date(date, user_offset)
     logger.info(f"Parsed local {date} into  UTC {utc_date}")
     when, when_iso = utc_date, utc_date.isoformat()
     logger.info("Setting up new reminder from custom date")
