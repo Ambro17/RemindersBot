@@ -49,8 +49,9 @@ def handle_repeat_decision(bot, update, chat_data, user_data):
             ).all()
         except Exception:
             logger.error('Reminder not found. %s', reminder_key)
-            cbackquery.message.edit_text("Boo! 👻"
-                                         " No puede recordarte de nuevo. Setealo otra vez")
+            cbackquery.message.edit_text("Boo 👻\n"
+                                         f"Can't re-set reminder. Please do it manually with `/remind {reminder_key}`",
+                                         parse_mode='markdown')
             return ConversationHandler.END
 
         logger.info(f"Found {len(reminders)} reminders under that key")

@@ -69,11 +69,16 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
         return ConversationHandler.END
 
     logger.info(f"User time selection: {update.callback_query.data!r}")
-    requested_delay = int(update.callback_query.data)
+    try:
+        requested_delay = int(update.callback_query.data)
+    except ValueError:
+        logger.info(f"Received input from another message with inline buttons: {update.callback_query.data}")
+        update.callback_query.message.edit_text('👻')
+        return
 
     if requested_delay == CUSTOM:
         logger.info("User selected custom date. Replying with available formats..")
-        text = (f"When should i remind you?\n"
+        text = (f"» *When should i remind you?*\n"
                 f"I understand dates like:\n"
                 f"👉 today at 17:00\n"
                 f"👉 tomorrow at 13:00\n"
@@ -105,8 +110,8 @@ def read_custom_date(bot, update, chat_data, job_queue, user_data):
     date = dateparser.parse(update.message.text, settings={'PREFER_DATES_FROM': 'future'})
     if date is None:
         logger.error('Error parsing date. Waiting for user retry.')
-        update.message.reply_text('What date is that? 🤨'
-                                  ' Try again with a more standard format (`d/m hh:mm`)',
+        update.message.reply_text('What date is that? 🤨\n'
+                                  'Try again with a more standard format. i.e: `d/m hh:mm`',
                                   parse_mode='markdown')
         return
 

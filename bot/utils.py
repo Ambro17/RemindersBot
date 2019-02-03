@@ -145,7 +145,7 @@ def _setup_reminder(bot, update, chat_data, job_queue, when, from_callback=False
     chat_data.update({'remind_date_iso': when.isoformat()})
     job_context = copy.deepcopy(chat_data)
 
-    logger.info(f'Adding job to db an job queue with context: {job_context}')
+    logger.info(f'Setting new reminder:\n{job_context}')
     success = add_reminder_job(bot, update, job_queue, job_context, when)
     if success:
         logger.info('SUCCESS')
