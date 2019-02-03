@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 from bot.constants import NORMAL_EXIT, ERROR_EXIT
 from bot.handlers.event_set import events_set
+from bot.handlers.feedback import add_feedback
 from bot.handlers.misc import start, default, ups_handler
 from bot.handlers.remove_reminder import remove_reminders
 from bot.handlers.repeat_reminder import repeat_reminder
@@ -46,6 +47,7 @@ def main():
     dp.add_handler(see_user_reminders)
     dp.add_handler(change_timezone)
     dp.add_handler(check_timezone)
+    dp.add_handler(add_feedback)
     dp.add_handler(events_set)
 
     # Add special handlers. Error handler and fallback handler.
