@@ -174,3 +174,13 @@ def utc_time_from_user_date(user_date, offset):
 def user_current_time(user_offset):
     """Return user datetime.now()"""
     return datetime.utcnow() + timedelta(seconds=user_offset)
+
+def get_reminder_key_from_text(text):
+    """Return the reminder key, ignoring username and emoji.
+
+    input:
+        @username the reminder text ✅
+    output:
+        the reminder text
+    """
+    return ' '.join(text.split(' ')[1:-1])

@@ -11,7 +11,7 @@ from bot.handlers.misc import cancel
 from bot.keyboard import DONE, REMIND_AGAIN
 from bot.jobs.db_ops import remove_reminder, get_reminders
 from bot.handlers.remind import read_custom_date, read_time_selection_from_button
-from bot.utils import msg_admin, init_reminder_context, _show_time_options
+from bot.utils import msg_admin, init_reminder_context, _show_time_options, get_reminder_key_from_text
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ def handle_repeat_decision(bot, update, chat_data, user_data):
     answer = cbackquery.data
 
     logger.info(f'Getting reminder key from text `{cbackquery.message.text}`')
-    reminder_key = cbackquery.message.text.split(' ')[1]
+    reminder_key = get_reminder_key_from_text(cbackquery.message.text)
     logger.info(f"Reminder key: {reminder_key!r}")
 
     if answer == DONE:
