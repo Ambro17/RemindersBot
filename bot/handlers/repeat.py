@@ -94,7 +94,7 @@ repeat_reminder = ConversationHandler(
             CallbackQueryHandler(
                 read_time_selection_from_button,
                 pass_chat_data=True,
-                pass_job_queue=True
+                pass_job_queue=True,
             )
         ],
         READ_CUSTOM_DATE: [
@@ -102,7 +102,9 @@ repeat_reminder = ConversationHandler(
             MessageHandler(Filters.text,
                            read_custom_date,
                            pass_chat_data=True,
-                           pass_job_queue=True)
+                           pass_job_queue=True,
+                           pass_user_data=True,
+                           )
         ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
