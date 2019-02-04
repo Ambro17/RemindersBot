@@ -2,6 +2,7 @@ import logging
 import random
 
 from telegram import TelegramError
+from telegram.ext import ConversationHandler
 
 from bot.utils import msg_admin
 
@@ -15,19 +16,19 @@ Hello! I'm @RRemindersBot and i'm here to remind you
 My skills include:
 
 /remind to set new reminders
-/reminders to show current reminders
+/myreminders to show your current reminders
 /delete to delete a reminder
 
 Before setting a new reminder it is recommended that 
 you set your timezone with 
-/setmytime
-so reminders work as expected. You can check with 
+/setmytime so reminders work as expected.
+You can then check with
 /mytime if it shows your current time
 
-There are also some command alias to ease interaction.
-/r = /recordar = /remind
-/borrar = /delete
-""")
+I also have a quick reminder shortcut:
+/q something, 20
+will let you set a reminder of _something_ in 20 minutes in just one message
+""", parse_mode='markdown')
 
 
 def ups_handler(bot, update, error):
@@ -49,3 +50,8 @@ def default(bot, update):
             chat_id=update.effective_message.chat_id,
             text="I don't get you 🧐.. write /start to see what are my skills"
         )
+
+
+def cancel(bot, update):
+    update.effective_message.reply_text('Operation cancelled ✅')
+    return ConversationHandler.END

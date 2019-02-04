@@ -30,7 +30,7 @@ def remove_reminder(text, **kwargs):
     session = Session()
     reminder = session.query(Reminder).filter_by(text=text, **kwargs).first()
     if reminder is None:
-        logger.info("Reminder (%s) does not exist on db")
+        logger.info(f"Reminder {text} does not exist on db")
         msg = f'🚫 El reminder `{text}` no existe en la base de datos'
     else:
         session.delete(reminder)

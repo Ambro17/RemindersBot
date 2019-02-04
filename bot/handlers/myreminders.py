@@ -31,6 +31,7 @@ def show_user_reminders(bot, update, user_data):
         format_reminder(rem, offset) for rem in reminders
     )
     update.message.reply_text(text or 'No reminders set yet', parse_mode='markdown')
+    logger.info('Reminders shown')
 
 
-see_user_reminders = CommandHandler('reminders', show_user_reminders, pass_user_data=True)
+see_user_reminders = CommandHandler('myreminders', show_user_reminders, pass_user_data=True)

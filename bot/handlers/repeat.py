@@ -4,9 +4,10 @@
 import logging
 import random
 
-from telegram.ext import ConversationHandler, CallbackQueryHandler, MessageHandler, Filters
+from telegram.ext import ConversationHandler, CallbackQueryHandler, MessageHandler, Filters, CommandHandler
 
 from bot.constants import READ_TIME_SELECTION, READ_CUSTOM_DATE
+from bot.handlers.misc import cancel
 from bot.keyboard import DONE, REMIND_AGAIN
 from bot.jobs.db_ops import remove_reminder, get_reminders
 from bot.handlers.remind import read_custom_date, read_time_selection_from_button
@@ -104,7 +105,7 @@ repeat_reminder = ConversationHandler(
                            pass_job_queue=True)
         ],
     },
-    fallbacks=[],
+    fallbacks=[CommandHandler('cancel', cancel)],
     name='Repeat reminder',
     persistent=True
 )

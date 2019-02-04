@@ -6,6 +6,7 @@ import logging
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, Filters
 
 from bot.constants import READ_DELETE
+from bot.handlers.misc import cancel
 from bot.jobs.db_ops import remove_reminder
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ remove_reminders = ConversationHandler(
     states={
         READ_DELETE: [MessageHandler(Filters.text, rm_reminder_from_text)]
     },
-    fallbacks=[],
+    fallbacks=[CommandHandler('cancel', cancel)],
     name='Delete reminders',
     persistent=True
 )

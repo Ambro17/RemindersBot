@@ -1,17 +1,19 @@
 """
     Handler that manages creation of new reminders
 """
+import copy
 import logging
 
 import dateparser
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, CallbackQueryHandler, Filters
 
-from bot.constants import READ_REMINDER, READ_TIME_SELECTION, READ_CUSTOM_DATE, CUSTOM
+from bot.constants import READ_REMINDER, READ_TIME_SELECTION, READ_CUSTOM_DATE, CUSTOM, MINUTE
+from bot.handlers.misc import cancel
 from bot.utils import (
     init_reminder_context,
     datetime_from_answer,
     _show_time_options,
-    _setup_reminder,
+    _setup_reminder_and_reply,
     utc_time_from_user_date,
     user_current_time,
 )
@@ -99,7 +101,10 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
     # Get datetime from requested_delay seconds
     when = datetime_from_answer(requested_delay)
     logger.info("Setting up new reminder from callback selection")
-    _setup_reminder(bot, update, chat_data, job_queue, when, from_callback=True)
+    chat_data.update({'remind_date_iso': when.isoformat()})
+    job_context = copy.deepcopy(chat_data)
+
+    _setup_reminder_and_reply(bot, update, job_context, job_queue, when, from_callback=True)
 
     logger.info("Conversation ended successfully")
     return ConversationHandler.END
@@ -125,9 +130,12 @@ def read_custom_date(bot, update, chat_data, job_queue, user_data):
 
     utc_date = utc_time_from_user_date(date, user_offset)
     logger.info(f"Parsed local {date} into  UTC {utc_date}")
-    when, when_iso = utc_date, utc_date.isoformat()
     logger.info("Setting up new reminder from custom date")
-    _setup_reminder(bot, update, chat_data, job_queue, when)
+
+    chat_data.update({'remind_date_iso': utc_date.isoformat()})
+    job_context = copy.deepcopy(chat_data)
+
+    _setup_reminder_and_reply(bot, update, job_context, job_queue, utc_date)
 
     logger.info("Conversation ended successfully")
     return ConversationHandler.END
@@ -161,7 +169,7 @@ reminders_set = ConversationHandler(
                            )
         ]
     },
-    fallbacks=[],
+    fallbacks=[CommandHandler('cancel', cancel)],
     allow_reentry=True,
     name='Set Reminders',
     persistent=True

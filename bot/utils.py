@@ -20,7 +20,7 @@ def _tag_user(user):
         return f"[{user.first_name}](tg://user?id={user.id})"
 
 
-def init_reminder_context(to_remind, user, chat_id, offset):
+def init_reminder_context(to_remind, user, chat_id, offset, **extra_args):
     logger.info(f"Building reminder context for {user.name}")
     return {
         'thing_to_remind': to_remind,
@@ -28,6 +28,7 @@ def init_reminder_context(to_remind, user, chat_id, offset):
         'user_tag': _tag_user(user),
         'chat_id': chat_id,
         'offset': offset,
+        **extra_args
     }
 
 
@@ -116,7 +117,7 @@ def _show_time_options(update, from_remind_again=False):
 
 def reply_reminder_details(update, job_context, from_callback=False):
     utc_date = dateparser.parse(job_context['remind_date_iso'])
-    user_date = utc_date + timedelta(seconds=job_context['offset'])
+    user_date = utc_date + timedelta(seconds=job_context.get('offset', 0))
     logger.info(f"Transformed UTC {utc_date} into {user_date} to inform user in his/her local time")
 
     text = (f"✅ Done. I will remind you of `{job_context['thing_to_remind']}`"
@@ -136,20 +137,17 @@ def isoformat_to_datetime(date_string):
     return dateparser.parse(date_string)
 
 
-def _setup_reminder(bot, update, chat_data, job_queue, when, from_callback=False):
-    """Setup a new reminder in the job_queue.
+def _setup_reminder_and_reply(bot, update, job_context, job_queue, when, from_callback=False):
+    """Setup a new reminder in the job_queue and reply with details or error notice.
 
     Notify the user in chat_data the thing s/he wants to remind when *when* datetime
     occurs, by setting up a new run_once job on the job_queue
     """
-    chat_data.update({'remind_date_iso': when.isoformat()})
-    job_context = copy.deepcopy(chat_data)
-
     logger.info(f'Setting new reminder:\n{job_context}')
     success = add_reminder_job(bot, update, job_queue, job_context, when)
     if success:
         logger.info('SUCCESS')
-        reply_reminder_details(update, job_context, from_callback=from_callback)
+        reply_reminder_details(update, job_context, from_callback)
     else:
         logger.error("ERROR. Could not save reminder.")
         update.callback_query.message.edit_text(
