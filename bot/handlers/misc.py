@@ -28,6 +28,8 @@ You can then check with
 I also have a quick reminder shortcut:
 /q something, 20
 will let you set a reminder of _something_ in 20 minutes in just one message
+
+If you have any feedback you can send it via /feedback
 """, parse_mode='markdown')
 
 

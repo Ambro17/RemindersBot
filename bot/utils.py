@@ -183,4 +183,4 @@ def get_reminder_key_from_text(text):
     output:
         the reminder text
     """
-    return ' '.join(text.split(' ')[1:-1])
+    return ' '.join(text.split()[1:-1])

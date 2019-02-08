@@ -21,14 +21,20 @@ def _seconds_offset(user_time):
     return offset.total_seconds()
 
 def _seconds_to_hour_n_minutes(seconds):
+    # Floor division truncates to lower number.
+    #  10 // 3 = 3
+    # -10 // 4 = -4
+    # So we work with absolute seconds.
+    seconds = abs(seconds)
     h, rest = divmod(seconds, HOUR)
     m, rest = divmod(rest, MINUTE)
     return int(h), int(m)
 
 def _offset_seconds_to_utc_shift(seconds):
+    sign = '-' if seconds < 0 else '+'
     h, m = _seconds_to_hour_n_minutes(seconds)
     padded_mins = str(m).zfill(2)
-    return f"{h}:{padded_mins}"
+    return f"{sign}{h}:{padded_mins}"
 
 def read_timezone(bot, update, user_data):
     try:
@@ -44,8 +50,8 @@ def read_timezone(bot, update, user_data):
         logger.info(f'User `{update.message.from_user.name}` seconds offset from utc is `{offset}`')
         user_data['offset'] = offset
 
-        h_m = _seconds_to_hour_n_minutes(offset)
-        update.message.reply_markdown(f'✅ Your UTC offset is `{h_m[0]}:{str(h_m[1]).zfill(2)}`')
+        utc_offset = _offset_seconds_to_utc_shift(offset)
+        update.message.reply_markdown(f'✅ Your UTC offset is `{utc_offset}`')
 
     return ConversationHandler.END
 

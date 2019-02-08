@@ -42,7 +42,6 @@ def handle_repeat_decision(bot, update, chat_data, user_data):
 
     elif answer == REMIND_AGAIN:
         # Fetch reminder from db
-        logger.info(f"Key {reminder_key}")
         try:
             reminders = get_reminders(
                 user_id=str(cbackquery.from_user.id),
@@ -77,7 +76,7 @@ def handle_repeat_decision(bot, update, chat_data, user_data):
     else:
         logger.error(f"Unexpected callback data {answer}")
         cbackquery.message.edit_text(
-            'Something unexpected happened 👻',
+            "🤨 I was expecting you to tell me if i should repeat the reminder or not.. Let's start over",
             reply_markup=None
         )
         logger.info("Conversation ended. Unexpected callback received when trying to decide repetition policy")

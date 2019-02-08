@@ -13,7 +13,8 @@ def default_msg(bot, update):
 def feedback(bot, update, args):
     if not args:
         update.effective_message.reply_text(
-            'Please tell me your bug 🐞 feature request 🌟 or suggestion 💭', quote=False
+            'Please tell me your bug 🐞 feature request 🌟 or suggestion 💭.\n'
+            'Be sure to include all relevant details', quote=False
         )
         return READ_FEEDBACK
     suggestion = ' '.join(args)
