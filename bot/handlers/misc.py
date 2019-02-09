@@ -20,14 +20,12 @@ My skills include:
 /delete to delete a reminder
 
 Before setting a new reminder it is recommended that 
-you set your timezone with 
-/setmytime so reminders work as expected.
-You can then check with
-/mytime if it shows your current time
+you click /setmytime so reminders work as expected.
+You can then check with /mytime if it shows your current time
 
 I also have a quick reminder shortcut:
 /q something, 20
-will let you set a reminder of _something_ in 20 minutes in just one message
+that will let you set a reminder of _something_ in 20 minutes in just one message
 
 If you have any feedback you can send it via /feedback
 """, parse_mode='markdown')

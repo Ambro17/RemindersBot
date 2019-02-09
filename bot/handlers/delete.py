@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def rm_reminder(bot, update, args):
     logger.info("STARTED new reminder removal")
     if not args:
-        update.effective_message.reply_text("🗑 Qué reminder queres borrar?", quote=False)
+        update.effective_message.reply_text("🗑 What reminder do you want to delete?", quote=False)
         logger.info("Waiting user input on what reminder to remove..")
         return READ_DELETE
 
