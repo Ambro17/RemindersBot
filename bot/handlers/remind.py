@@ -78,7 +78,7 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
     except ValueError:
         logger.info(f"Received input from another message with inline buttons: {update.callback_query.data}")
         update.callback_query.message.edit_text('👻')
-        return
+        return ConversationHandler.END
 
     if requested_delay == CUSTOM:
         logger.info("User selected custom date. Replying with available formats..")
