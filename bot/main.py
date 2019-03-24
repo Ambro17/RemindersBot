@@ -57,7 +57,6 @@ def main():
     dp.add_handler(fallback_handler)
 
     logger.info('Up and running')
-    msg_admin(updater.bot, "⚡️ I'm up and running ⚡️️")
     updater.start_polling()
     updater.idle()
 
