@@ -42,7 +42,7 @@ def datetime_from_answer(time_delay):
     return when
 
 
-def add_reminder_job(bot, update, job_queue, job_context, when):
+def add_reminder_job(update, job_queue, job_context, when):
     logger.info(f"Adding job to db..")
     added = add_job_to_db(job_context)
     if added:
@@ -50,7 +50,7 @@ def add_reminder_job(bot, update, job_queue, job_context, when):
         logger.info(f"Job added to job queue and db.")
     else:
         logger.error('Could not save reminder job')
-        msg_admin(bot, f"Error saving reminder.\n CONTEXT:\n{job_context}\n")
+        update.effective_message.reply_text('Something went wrong')
 
     return added
 
@@ -84,12 +84,13 @@ def reminder_key(job_ctx):
     )
 
 
-def send_notification(bot, job):
+def send_notification(context):
     TIME_ICONS = ['⏰', '🔊', '🔈', '🔉', '📣', '📢', '❕', '🎉', '🎊', '⏱']
     random_time_emoji = random.choice(TIME_ICONS)
-    to_remind = job.context['thing_to_remind']
+    job = context.job
+    to_remind = context.job.context['thing_to_remind']
 
-    bot.send_message(
+    context.bot.send_message(
         chat_id=job.context['chat_id'],
         text=f"{job.context['user_tag']} {to_remind} {random_time_emoji} ",
         reply_markup=done_or_repeat_reminder()
@@ -137,14 +138,14 @@ def isoformat_to_datetime(date_string):
     return dateparser.parse(date_string)
 
 
-def _setup_reminder_and_reply(bot, update, job_context, job_queue, when, from_callback=False):
+def _setup_reminder_and_reply(update, job_queue, job_context, when, from_callback=False):
     """Setup a new reminder in the job_queue and reply with details or error notice.
 
     Notify the user in chat_data the thing s/he wants to remind when *when* datetime
     occurs, by setting up a new run_once job on the job_queue
     """
     logger.info(f'Setting new reminder:\n{job_context}')
-    success = add_reminder_job(bot, update, job_queue, job_context, when)
+    success = add_reminder_job(update, job_queue, job_context, when)
     if success:
         logger.info('SUCCESS')
         reply_reminder_details(update, job_context, from_callback)

@@ -9,7 +9,7 @@ from bot.utils import msg_admin
 logger = logging.getLogger(__name__)
 
 
-def start(bot, update):
+def start(update, context):
     update.message.reply_text("""
 Hello! I'm @RRemindersBot and i'm here to remind you
 
@@ -31,27 +31,27 @@ If you have any feedback you can send it via /feedback
 """, parse_mode='markdown')
 
 
-def ups_handler(bot, update, error):
+def ups_handler(update, context):
     try:
-        raise error
+        raise context.error
     except TelegramError:
         logger.exception("A Telegram error occurred")
     except Exception:
         logger.exception("A general error occurred")
     finally:
         update.effective_message.reply_text('Errors happen ¯\\_(ツ)_/¯')
-        msg_admin(bot, 'An error occurred on the bot. Check the logs')
+        msg_admin(context.bot, 'An error occurred on the bot. Check the logs')
 
 
-def default(bot, update):
+def default(update, context):
     """If a user sends an unknown command, answer accordingly. But not always to avoid flooding"""
     if random.choice((0, 1)):
-        bot.send_message(
+        context.bot.send_message(
             chat_id=update.effective_message.chat_id,
             text="I don't get you 🧐.. write /start to see what are my skills"
         )
 
 
-def cancel(bot, update):
+def cancel(update, context):
     update.effective_message.reply_text('Operation cancelled ✅')
     return ConversationHandler.END

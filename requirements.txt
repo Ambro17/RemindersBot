@@ -1,4 +1,4 @@
-git+git://github.com/python-telegram-bot/python-telegram-bot@master
+git+git://github.com/python-telegram-bot/python-telegram-bot@v12.0.0b1
 sqlalchemy
 psycopg2-binary
 dateparser

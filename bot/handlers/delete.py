@@ -12,23 +12,23 @@ from bot.jobs.db_ops import remove_reminder
 logger = logging.getLogger(__name__)
 
 
-def rm_reminder(bot, update, args):
+def rm_reminder(update, context):
     logger.info("STARTED new reminder removal")
-    if not args:
+    if not context.args:
         update.effective_message.reply_text("🗑 What reminder do you want to delete?", quote=False)
         logger.info("Waiting user input on what reminder to remove..")
         return READ_DELETE
 
-    reminder_key = ' '.join(args)
-    return _delete_reminder(bot, update, reminder_key)
+    reminder_key = ' '.join(context.args)
+    return _delete_reminder(update, reminder_key)
 
 
-def rm_reminder_from_text(bot, update):
+def rm_reminder_from_text(update, context):
     reminder_key = update.message.text
-    return _delete_reminder(bot, update, reminder_key)
+    return _delete_reminder(update, reminder_key)
 
 
-def _delete_reminder(bot, update, reminder_key):
+def _delete_reminder(update, reminder_key):
     msg = remove_reminder(
         text=reminder_key,
         user_id=str(update.message.from_user.id),
@@ -41,8 +41,7 @@ def _delete_reminder(bot, update, reminder_key):
 
 remove_reminders = ConversationHandler(
     entry_points=[
-        CommandHandler('delete', rm_reminder, pass_args=True),
-        CommandHandler('borrar', rm_reminder, pass_args=True),
+        CommandHandler(['delete', 'borrar'], rm_reminder),
     ],
     states={
         READ_DELETE: [MessageHandler(Filters.text, rm_reminder_from_text)]

@@ -8,7 +8,7 @@ HOUR = 60 * MINUTE
 
 logger = logging.getLogger(__name__)
 
-def prompt_timezone(bot, update):
+def prompt_timezone(update, context):
     update.message.reply_markdown('Enter your current time in `d/m HH:MM` format')
     return READ_TIMEZONE
 
@@ -36,7 +36,7 @@ def _offset_seconds_to_utc_shift(seconds):
     padded_mins = str(m).zfill(2)
     return f"{sign}{h}:{padded_mins}"
 
-def read_timezone(bot, update, user_data):
+def read_timezone(update, context):
     try:
         user_time = datetime.strptime(update.message.text, '%d/%m %H:%M')
     except ValueError:
@@ -48,7 +48,7 @@ def read_timezone(bot, update, user_data):
     else:
         offset = _seconds_offset(user_time)
         logger.info(f'User `{update.message.from_user.name}` seconds offset from utc is `{offset}`')
-        user_data['offset'] = offset
+        context.user_data['offset'] = offset
 
         utc_offset = _offset_seconds_to_utc_shift(offset)
         update.message.reply_markdown(f'✅ Your UTC offset is `{utc_offset}`')
@@ -64,7 +64,7 @@ change_timezone = ConversationHandler(
     states={
         READ_TIMEZONE: [
             # Wait for user input on what is his/her current time
-            MessageHandler(Filters.text, read_timezone, pass_user_data=True)
+            MessageHandler(Filters.text, read_timezone)
         ],
     },
     fallbacks=[],
@@ -72,8 +72,8 @@ change_timezone = ConversationHandler(
     persistent=True
 )
 
-def check_time(bot, update, user_data):
-    offset = user_data.get('offset')
+def check_time(update, context):
+    offset = context.user_data.get('offset')
     if offset is None:
         text = "You haven't set your time yet. Do it with /setmytime"
     else:
@@ -84,4 +84,4 @@ def check_time(bot, update, user_data):
     update.message.reply_markdown(text)
 
 
-check_timezone = CommandHandler('mytime', check_time, pass_user_data=True)
+check_timezone = CommandHandler('mytime', check_time)

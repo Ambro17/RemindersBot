@@ -21,26 +21,26 @@ from bot.utils import (
 logger = logging.getLogger(__name__)
 
 
-def remind(bot, update, args, chat_data, user_data):
+def remind(update, context):
     """Initialize reminder context and ask for reminder if it isn't yet known"""
     logger.info('STARTED new /remind conversation')
-    user_offset = user_data.get('offset')
+    user_offset = context.user_data.get('offset')
     if not user_offset:
         update.message.reply_text('Please first set your current time with /setmytime')
         return ConversationHandler.END
-    if not args:
+    if not context.args:
         # If the user did not specify what to remind, ask him/her
         update.effective_message.reply_text("⏰ What do you want to remind?", quote=False)
         logger.info("Waiting for user input on what to remind..")
         return READ_REMINDER
 
     msg = update.message
-    thing_to_remind = ' '.join(args)
+    thing_to_remind = ' '.join(context.args)
     logger.info(f'Reminder args: {thing_to_remind}')
 
-    context = init_reminder_context(thing_to_remind, msg.from_user, msg.chat_id, user_offset)
-    chat_data.update(context)
-    logger.info(f"Read '{thing_to_remind}' from {context['user_tag']}."
+    reminder_context = init_reminder_context(thing_to_remind, msg.from_user, msg.chat_id, user_offset)
+    context.chat_data.update(reminder_context)
+    logger.info(f"Read '{thing_to_remind}' from {reminder_context['user_tag']}."
                 f" Offering time options..")
 
     # User time selection will be captured by read_time_selection_from_button
@@ -49,24 +49,28 @@ def remind(bot, update, args, chat_data, user_data):
     return READ_TIME_SELECTION
 
 
-def read_reminder(bot, update, chat_data, user_data):
+def read_reminder(update, context):
     try:
         msg = update.message
         logger.info(f'Read user input: {msg.text}')
-        context = init_reminder_context(msg.text, msg.from_user, msg.chat_id, user_data.get('offset', 0))
-        chat_data.update(context)
+        user_offset = context.user_data.get('offset', 0)
+        reminder_context = init_reminder_context(msg.text, msg.from_user, msg.chat_id, user_offset)
+        context.chat_data.update(reminder_context)
         logger.info('Showing time options..')
         _show_time_options(update)
 
-    except Exception:
-        logger.info('User did not enter text.')
+    except Exception as e:
+        logger.info('User did not enter text.', exc_info=True)
         update.effective_message.reply_text('Please input text')
         return  # Reenter current state until valid user input
 
     return READ_TIME_SELECTION
 
 
-def read_time_selection_from_button(bot, update, chat_data, job_queue):
+def read_time_selection_from_button(update, context):
+    chat_data = context.chat_data
+    job_queue = context.job_queue
+
     if not chat_data:
         logger.error(f"No chat data/user_data available to set reminder. Chat: {chat_data}. Update: {update.to_dict()}")
         update.callback_query.message.reply_text("I'm sorry, I forgot who you are! let's try again ")
@@ -104,15 +108,19 @@ def read_time_selection_from_button(bot, update, chat_data, job_queue):
     chat_data.update({'remind_date_iso': when.isoformat()})
     job_context = copy.deepcopy(chat_data)
 
-    _setup_reminder_and_reply(bot, update, job_context, job_queue, when, from_callback=True)
+    _setup_reminder_and_reply(update, job_queue, job_context, when, from_callback=True)
 
     logger.info("Conversation ended successfully")
     return ConversationHandler.END
 
 
-def read_custom_date(bot, update, chat_data, job_queue, user_data):
+def read_custom_date(update, context):
     """Parse offseted date from user and save a job in utc time. Show reminder details localized"""
+    chat_data = context.chat_data
+    job_queue = context.job_queue
+    user_data = context.user_data
     user_date = update.message.text
+
     user_offset = user_data.get('offset', 0)
     logger.info(f'User input date: {user_date}. Attempting parsing with offset: {user_offset}')
 
@@ -135,7 +143,7 @@ def read_custom_date(bot, update, chat_data, job_queue, user_data):
     chat_data.update({'remind_date_iso': utc_date.isoformat()})
     job_context = copy.deepcopy(chat_data)
 
-    _setup_reminder_and_reply(bot, update, job_context, job_queue, utc_date)
+    _setup_reminder_and_reply(update, job_queue, job_context, utc_date)
 
     logger.info("Conversation ended successfully")
     return ConversationHandler.END
@@ -143,30 +151,20 @@ def read_custom_date(bot, update, chat_data, job_queue, user_data):
 
 reminders_set = ConversationHandler(
     entry_points=[
-        CommandHandler('r', remind, pass_args=True, pass_chat_data=True, pass_user_data=True),
-        CommandHandler('remind', remind, pass_args=True, pass_chat_data=True, pass_user_data=True),
-        CommandHandler('recordar', remind, pass_args=True, pass_chat_data=True, pass_user_data=True)
+        CommandHandler(['r', 'remind', 'recordar'], remind),
     ],
     states={
         READ_REMINDER: [
             # If user hasn't specified what to remind, wait until s/he writes it.
-            MessageHandler(Filters.text, read_reminder, pass_chat_data=True, pass_user_data=True)
+            MessageHandler(Filters.text, read_reminder)
         ],
         READ_TIME_SELECTION: [
             # Wait for user input on when s/he wants to be reminded
-            CallbackQueryHandler(
-                read_time_selection_from_button,
-                pass_chat_data=True,
-                pass_job_queue=True,
-            )
+            CallbackQueryHandler(read_time_selection_from_button)
         ],
         READ_CUSTOM_DATE: [
             # If user selected Custom option, wait until it writes a date as remind time
-            MessageHandler(Filters.text, read_custom_date,
-                           pass_chat_data=True,
-                           pass_job_queue=True,
-                           pass_user_data=True,
-                           )
+            MessageHandler(Filters.text, read_custom_date)
         ]
     },
     fallbacks=[CommandHandler('cancel', cancel)],

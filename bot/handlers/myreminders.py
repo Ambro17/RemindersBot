@@ -13,7 +13,7 @@ from bot.utils import isoformat_to_datetime
 logger = logging.getLogger(__name__)
 
 
-def show_user_reminders(bot, update, user_data):
+def show_user_reminders(update, context):
     user = update.message.from_user
     logger.info(f"Showing user reminders to {user.name}")
     reminders = get_reminders(user_id=str(user.id), expired=False)
@@ -25,7 +25,7 @@ def show_user_reminders(bot, update, user_data):
         date_text = user_date.strftime('%d/%m/%Y %H:%M')
         return f"{rem.text:{width}} | `{date_text}`"
 
-    offset = user_data.get('offset', 0)
+    offset = context.user_data.get('offset', 0)
     logger.info(f"Formatting reminders with offset {offset}..")
     text = '\n'.join(
         format_reminder(rem, offset) for rem in reminders
@@ -34,4 +34,4 @@ def show_user_reminders(bot, update, user_data):
     logger.info('Reminders shown')
 
 
-see_user_reminders = CommandHandler('myreminders', show_user_reminders, pass_user_data=True)
+see_user_reminders = CommandHandler('myreminders', show_user_reminders)

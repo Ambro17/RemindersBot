@@ -30,7 +30,7 @@ from bot.utils import msg_admin
 
 def main():
     bot_persistence = PSQLPersistence(os.environ['DATABASE_URL'])
-    updater = Updater(os.environ['BOT_KEY'], persistence=bot_persistence)
+    updater = Updater(os.environ['BOT_KEY'], persistence=bot_persistence, use_context=True)
     dp = updater.dispatcher
 
     start_handler = CommandHandler('start', start)
