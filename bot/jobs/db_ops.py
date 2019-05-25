@@ -41,6 +41,6 @@ def remove_reminder(text, **kwargs):
     return msg
 
 
-def get_reminders(**kwargs):
+def get_reminders(order_attr=None, **kwargs):
     session = Session()
-    return session.query(Reminder).filter_by(**kwargs)
+    return session.query(Reminder).filter_by(**kwargs).order_by(order_attr)

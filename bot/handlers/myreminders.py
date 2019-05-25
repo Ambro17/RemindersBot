@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def show_user_reminders(update, context):
     user = update.message.from_user
     logger.info(f"Showing user reminders to {user.name}")
-    reminders = get_reminders(user_id=str(user.id), expired=False)
+    reminders = get_reminders(user_id=str(user.id), expired=False, order_attr='remind_time')
 
     def format_reminder(rem, offset):
         width = 10
