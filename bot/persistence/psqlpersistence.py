@@ -15,7 +15,7 @@ logger = logging.getLogger('psqlpersistence')
 class PSQLPersistence(BasePersistence):
     def __init__(self, db_name):
         super().__init__()
-        self.database = Database(db_name)
+        self.db_name = db_name
         self._state = None
         self._chat_data = None
         self._user_data = None
@@ -26,7 +26,7 @@ class PSQLPersistence(BasePersistence):
         """Querys the db and load bot state into memory"""
         logger.info("Loading state from db..")
         try:
-            with self.database as db:
+            with Database(self.db_name) as db:
                 db.query("SELECT info FROM state")
                 state = db.fetchone()
                 logger.info('State from db: \n%s', state)
@@ -35,6 +35,7 @@ class PSQLPersistence(BasePersistence):
                 self._user_data = defaultdict(dict, self._remap_user_keys(self._state.get('user_data', {})))
                 self._conv_data = self._remap_conv_keys(defaultdict(dict, self._state.get('conv_data', {})))
                 self._loaded_data = True
+                db.commit()
 
         except Exception:
             logger.error('Error loading state from db', exc_info=True)
@@ -159,16 +160,15 @@ class PSQLPersistence(BasePersistence):
     def flush(self):
         """Be sure to dump latest data before bot shutdown"""
         logger.info('Saving bot state before shutdown..')
-        with self.database as db:
+        with Database(self.db_name) as db:
             try:
                 db.query("DELETE FROM state")
                 db.query("INSERT INTO state (info) VALUES ('%s')" % self._dump_state_to_json())
+                db.commit()
             except Exception:
                 logger.exception("Error saving bot state. Bot will not remember latest interactions")
             else:
                 logger.info('SUCCESS. Bot state saved into db')
 
-            finally:
-                self.database.close()
 
         logger.info('Closing database..')

@@ -22,6 +22,9 @@ class PSQLDatabase(object):
     def close(self):
         return self._conn.close()
 
+    def commit(self):
+        return self._conn.commit()
+
     def fetchone(self):
         return self._cursor.fetchone()
 
