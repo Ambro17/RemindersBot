@@ -6,6 +6,8 @@ import sys
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+from bot.handlers.todo import add_todo_cmd, show_todos_cmd, mark_as_done_cmd
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s [%(funcName)s] %(message)s',
     level=logging.INFO
@@ -51,6 +53,9 @@ def main():
     dp.add_handler(add_feedback)
     dp.add_handler(quick_reminder)
     dp.add_handler(events_set)
+    dp.add_handler(add_todo_cmd)
+    dp.add_handler(show_todos_cmd)
+    dp.add_handler(mark_as_done_cmd)
 
     # Add special handlers. Error handler and fallback handler.
     dp.add_error_handler(ups_handler)

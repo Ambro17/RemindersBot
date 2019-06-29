@@ -47,3 +47,10 @@ class Reminder(Base):
         return (f"Reminder(text={self.text}, user_id={self.user_id}, user_tag={self.user_tag},"
                 f" remind_time={self.remind_time}, offset= {self.offset}, chat_id={self.chat_id},"
                 f" key={self.key}, expired={self.expired})")
+
+
+class Todo(Base):
+    __tablename__ = 'todo'
+    id = Column(Integer, primary_key=True)
+    text = Column(String)
+    done = Column(Boolean, default=False)

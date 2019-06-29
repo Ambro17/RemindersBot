@@ -167,6 +167,8 @@ class PSQLPersistence(BasePersistence):
                 logger.exception("Error saving bot state. Bot will not remember latest interactions")
             else:
                 logger.info('SUCCESS. Bot state saved into db')
+
+            finally:
                 self.database.close()
 
         logger.info('Closing database..')
