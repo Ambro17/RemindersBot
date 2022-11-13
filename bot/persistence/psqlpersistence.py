@@ -84,6 +84,12 @@ class PSQLPersistence(BasePersistence):
             for k, v in iterable.items()
         }
 
+    def get_bot_data(self):
+        return defaultdict(dict)
+
+    def update_bot_data(self):
+        return defaultdict(dict)
+
     def get_user_data(self):
         if not self._loaded_data:
             self._load_state_from_db()

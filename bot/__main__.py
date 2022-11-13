@@ -27,7 +27,6 @@ from bot.handlers.mytimezone import change_timezone, check_timezone
 from bot.handlers.myreminders import see_user_reminders
 from bot.jobs.job_loader import load_reminders
 from bot.persistence.psqlpersistence import PSQLPersistence
-from bot.utils import msg_admin
 
 
 def main():

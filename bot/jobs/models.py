@@ -12,6 +12,11 @@ engine = create_engine(os.environ['DATABASE_URL'])
 Session = sessionmaker(bind=engine)
 
 
+def create_tables():
+    # Also manually CREATE TABLE state (info json); not tracked by alchemy
+    Base.metadata.create_all(engine)
+
+
 class JSONEncodedValue(TypeDecorator):
     """Represents an immutable structure as a json-encoded string."""
 

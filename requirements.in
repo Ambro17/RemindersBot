@@ -1,0 +1,6 @@
+python-telegram-bot
+sqlalchemy
+psycopg2-binary
+dateparser
+pytz
+munch

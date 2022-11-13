@@ -3,6 +3,7 @@ import psycopg2
 
 logger = logging.getLogger()
 
+
 class PSQLDatabase(object):
     """PSQL Database class to ease querys, opening and closing"""
 

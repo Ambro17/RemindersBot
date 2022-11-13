@@ -39,8 +39,9 @@ def ups_handler(update, context):
     except Exception:
         logger.exception("A general error occurred")
     finally:
-        update.effective_message.reply_text('Errors happen ¯\\_(ツ)_/¯')
-        msg_admin(context.bot, 'An error occurred on the bot. Check the logs')
+        if update and update.effective_message:
+            update.effective_message.reply_text('Errors happen ¯\\_(ツ)_/¯')
+            msg_admin(context.bot, 'An error occurred on the bot. Check the logs')
 
 
 def default(update, context):
