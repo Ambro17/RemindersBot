@@ -10,7 +10,7 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install requirments in virtualenv
-RUN pip install --upgrade wheel
+RUN pip install --upgrade pip wheel
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
