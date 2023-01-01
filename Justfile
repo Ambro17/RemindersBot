@@ -8,7 +8,7 @@ bash: build
     docker run -it --rm --env-file .env bot bash
 
 lockdeps:
-    pip-compile requirements.in -o requirements.txt
+    pip-compile requirements.in -o requirements.txt --resolver=backtracking
 
 deploy:
     git push dokku master:master

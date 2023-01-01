@@ -1,5 +1,5 @@
 python-telegram-bot==12.3.0
-sqlalchemy
+sqlalchemy==1.3.24
 psycopg2-binary
 dateparser
 pytz
