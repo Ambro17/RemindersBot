@@ -9,3 +9,7 @@ bash: build
 
 lockdeps:
     pip-compile requirements.in -o requirements.txt
+
+deploy:
+    git push dokku master:master
+
