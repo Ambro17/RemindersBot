@@ -4,5 +4,8 @@ build flags="":
 run: build
     docker run -it --rm --env-file .env bot
 
+bash: build
+    docker run -it --rm --env-file .env bot bash
+
 lockdeps:
-    pip-tools
+    pip-compile requirements.in -o requirements.txt
