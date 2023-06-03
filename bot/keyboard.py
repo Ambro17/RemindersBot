@@ -18,10 +18,10 @@ def time_options_keyboard():
             Button('8 Hours', callback_data=8 * HOUR),
         ],
         [
-            Button('10 Hours', callback_data=10 * HOUR),
             Button('12 Hours', callback_data=12 * HOUR),
-            Button('16 Hours', callback_data=16 * HOUR),
-            Button('24 Hours', callback_data=48 * HOUR),
+            Button('24 Hours', callback_data=24 * HOUR),
+            Button('48 Hours', callback_data=48 * HOUR),
+            Button('72 Hours', callback_data=72 * HOUR),
         ],
         [
             Button('Specific Date 📝', callback_data=-1)
