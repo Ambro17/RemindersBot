@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.types import TypeDecorator, VARCHAR
+from sqlalchemy.dialects.postgresql import JSON
 
 Base = declarative_base()
 
@@ -31,6 +32,10 @@ class JSONEncodedValue(TypeDecorator):
         if value is not None:
             value = json.loads(value)
         return value
+
+class State(Base):
+    __tablename__ = 'state'
+    info = Column(JSON)
 
 
 class Reminder(Base):
