@@ -16,3 +16,6 @@ deploy:
 setsecrets:
     echo "Remember to export the variables before running this!"
     fly secrets set DATABASE_URL=$DATABASE_URL BOT_KEY=$BOT_KEY
+
+connectdb:
+    fly pg connect -a remindersbot-db -d remindersbot
