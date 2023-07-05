@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+from bot.jobs.models import create_tables
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -30,8 +31,8 @@ from bot.persistence.psqlpersistence import PSQLPersistence
 
 
 def main():
-    bot_persistence = PSQLPersistence(os.environ['DATABASE_URL'])
-    updater = Updater(os.environ['BOT_KEY'], persistence=bot_persistence, use_context=True)
+    bot_persistence = PSQLPersistence(os.environ.get('DATABASE_URL', 'Missing'))
+    updater = Updater(os.environ.get('BOT_KEY', 'Missing'), persistence=bot_persistence, use_context=True)
     dp = updater.dispatcher
 
     start_handler = CommandHandler('start', start)
@@ -68,6 +69,7 @@ def main():
 
 
 if __name__ == '__main__':
+    create_tables()
     try:
         sys.exit(main())
     except Exception as e:

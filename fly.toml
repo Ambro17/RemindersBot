@@ -1,0 +1,5 @@
+app = "remindersbot"
+primary_region = "eze"
+kill_signal = "SIGINT"
+kill_timeout = 5
+# processes = [] # If you don't explicitly define any processes, then the Machines in a Fly App belong to the default app process group, and on boot they run whatever entrypoint process the app's Docker image has. 

@@ -11,17 +11,8 @@ lockdeps:
     pip-compile requirements.in -o requirements.txt --resolver=backtracking
 
 deploy:
-    git push dokku master:master
-
-ssh:
-    ssh root@137.184.158.113
-
-linkremote:
-    git remote add dokku dokku@137.184.158.113:reminders
-
-unlinkremote:
-    git remote remove dokku
+    fly deploy
 
 setsecrets:
-    # on dokku host
-    dokku config:set reminders DATABASE_URL=1 BOT_KEY=2
+    echo "Remember to export the variables before running this!"
+    fly secrets set DATABASE_URL=$DATABASE_URL BOT_KEY=$BOT_KEY

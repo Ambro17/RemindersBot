@@ -19,7 +19,3 @@ WORKDIR /app
 COPY bot bot
 
 CMD ["python", "-m", "bot"]
-
-
-
-
