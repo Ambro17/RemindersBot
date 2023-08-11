@@ -17,7 +17,7 @@ def add_todo(update, context):
         except Exception as e:
             msg = f'Error: {repr(e)}'
 
-    update.callback_query.message.reply_markdown(msg)
+    update.effective_message.reply_markdown(msg)
 
 
 def show_todos(update, context):
@@ -31,7 +31,7 @@ def show_todos(update, context):
     else:
         msg = '\n'.join(f"{todo.id}: {todo.text}" for todo in todos)
 
-    update.message.reply_text(msg)
+    update.effective_message.reply_text(msg)
 
 
 def mark_as_done(update, context):
@@ -54,7 +54,7 @@ def mark_as_done(update, context):
         s.commit()
         msg = f"✅ Congratz. You've finished one todo"
 
-    update.callback_query.message.reply_markdown(msg)
+    update.effective_message.reply_markdown(msg)
 
 
 add_todo_cmd = CommandHandler('todo', add_todo)

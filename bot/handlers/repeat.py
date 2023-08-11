@@ -35,7 +35,7 @@ def handle_repeat_decision(update, context):
         try:
             remove_reminder(text=reminder_key, user_id=str(cbackquery.from_user.id))
         except Exception:
-            msg_admin(f"Error deleting reminder {reminder_key} from {cbackquery.from_user.name}")
+            msg_admin(context.bot,f"Error deleting reminder {reminder_key} from {cbackquery.from_user.name}")
 
         logger.info("ENDED Conversation successfully")
         return ConversationHandler.END
