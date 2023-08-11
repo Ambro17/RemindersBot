@@ -35,7 +35,7 @@ class JSONEncodedValue(TypeDecorator):
 
 class State(Base):
     __tablename__ = 'state'
-    info = Column(JSON)
+    info = Column(JSON, primary_key=True)
 
 
 class Reminder(Base):
