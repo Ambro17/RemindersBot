@@ -17,7 +17,7 @@ def add_todo(update, context):
         except Exception as e:
             msg = f'Error: {repr(e)}'
 
-    update.message.reply_markdown(msg)
+    update.callback_query.message.reply_markdown(msg)
 
 
 def show_todos(update, context):
@@ -48,13 +48,13 @@ def mark_as_done(update, context):
     s = Session()
     todo = s.query(Todo).filter_by(id=todo_id, done=False).first()
     if todo is None:
-        msg = f'🚫 No pending todo with id`{todo_id}`'
+        msg = f'🚫 No pending todo with id `{todo_id}`'
     else:
         todo.done = True
         s.commit()
         msg = f"✅ Congratz. You've finished one todo"
 
-    update.message.reply_markdown(msg)
+    update.callback_query.message.reply_markdown(msg)
 
 
 add_todo_cmd = CommandHandler('todo', add_todo)
