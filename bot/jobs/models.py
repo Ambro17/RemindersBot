@@ -9,7 +9,8 @@ from sqlalchemy.dialects.postgresql import JSON
 
 Base = declarative_base()
 
-engine = create_engine(os.environ['DATABASE_URL'])
+MINUTE = 60 # See https://community.fly.io/t/postgresql-connection-is-closed-error-after-a-few-minutes-of-activity/4768/3
+engine = create_engine(os.environ['DATABASE_URL'], pool_recycle=30 * MINUTE)
 Session = sessionmaker(bind=engine)
 
 
