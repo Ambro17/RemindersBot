@@ -5,7 +5,9 @@
 #    pip-compile --output-file=requirements.txt --resolver=backtracking requirements.in
 #
 certifi==2022.12.7
-    # via python-telegram-bot
+    # via
+    #   python-telegram-bot
+    #   sentry-sdk
 cffi==1.15.1
     # via cryptography
 cryptography==39.0.1
@@ -32,6 +34,8 @@ pytz-deprecation-shim==0.1.0.post0
     # via tzlocal
 regex==2022.3.2
     # via dateparser
+sentry-sdk==1.30.0
+    # via -r requirements.in
 six==1.16.0
     # via
     #   munch
@@ -44,3 +48,5 @@ tzdata==2022.7
     # via pytz-deprecation-shim
 tzlocal==4.2
     # via dateparser
+urllib3==2.0.4
+    # via sentry-sdk

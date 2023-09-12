@@ -1,6 +1,7 @@
 import logging
 import random
 
+from sentry_sdk import capture_exception
 from telegram import TelegramError
 from telegram.ext import ConversationHandler
 
@@ -32,6 +33,7 @@ If you have any feedback you can send it via /feedback
 
 
 def ups_handler(update, context):
+    capture_exception(context.error)
     try:
         raise context.error
     except TelegramError:
