@@ -5,6 +5,7 @@ import os
 import sys
 from bot.jobs.models import create_tables
 
+import sentry_sdk
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from bot.handlers.todo import add_todo_cmd, show_todos_cmd, mark_as_done_cmd
@@ -31,6 +32,12 @@ from bot.persistence.psqlpersistence import PSQLPersistence
 
 
 def main():
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+
     bot_persistence = PSQLPersistence(os.environ.get('DATABASE_URL', 'Missing'))
     updater = Updater(os.environ.get('BOT_KEY', 'Missing'), persistence=bot_persistence, use_context=True)
     dp = updater.dispatcher
